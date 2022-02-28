@@ -6,8 +6,8 @@ void main() {
   runApp(const MyApp());
 }
 
-Map timing = {'-': 200, '.': 50, ' ': 0};
 Map mapper = {
+  ' ': '     ',
   'a': '.-',
   'b': '-...',
   'c': '-.-.',
@@ -34,8 +34,29 @@ Map mapper = {
   'x': '-..-',
   'y': '-.--',
   'z': '--..',
-  ' ': '     '
+  '1': '.----',
+  '2': '..---',
+  '3': '...--',
+  '4': '....-',
+  '5': '.....',
+  '6': '-....',
+  '7': '--...',
+  '8': '---..',
+  '9': '----.',
+  '0': '-----',
+  '?': '..--..',
+  '!': '-.-.--',
+  '.': '.-.-.-',
+  ',': '--..--',
+  ';': '-.-.-.',
+  ':': '---...',
+  '+': '.-.-.',
+  '-': '-....-',
+  '/': '-..-.',
+  '=': '-...-',
 };
+
+Map timing = {'-': 300, '.': 100, ' ': 0};
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -43,6 +64,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      title: 'App Title',
+
       home: MyHomePage(),
       debugShowCheckedModeBanner: false,
     );
@@ -59,21 +82,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController text1 = TextEditingController();
 
-  String code = '';
+  String morsecode = '';
 
-  void encoder() {
+  void text2morse() {
     setState(() {
       String temp = text1.text.toLowerCase();
-      code = '';
+      morsecode = '';
       for (int i = 0; i < temp.length; i++) {
-        code += mapper[temp[i]] + ' ';
+        morsecode += mapper[temp[i]] + ' ';
+        }
       }
-    });
+    );
   }
 
-  void lit() {
-    for (int i = 0; i < code.length - 1; i++) {
-      int time = timing[code[i]];
+  void flash() {
+    for (int i = 0; i < morsecode.length - 1; i++) {
+      int time = timing[morsecode[i]];
       time > 0 ? TorchLight.enableTorch() : 1;
       sleep(Duration(milliseconds: time));
       TorchLight.disableTorch();
@@ -85,31 +109,41 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Text > Morse'),
+        title: const Text(
+            'Morse code flasher',
+          //style: TextStyle(
+            //fontStyle: FontStyle.italic,
+          //),
+        ),
       ),
       body: Column(children: <Widget>[
         TextField(
           controller: text1,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(
+            )
+          ),
         ),
-        ElevatedButton(
-            onPressed: encoder,
+        OutlinedButton(
+            onPressed: text2morse,
             child: const Text(
-              "Convert To Morse Code",
-            )),
-        Text(
-          code,
+              "Convert",
+            )
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-                onPressed: lit,
-                child: const Text(
-                  "Flash",
-                ))
-          ],
-        )
-      ]),
+        Text(
+          morsecode,
+          style: const TextStyle(
+            fontSize: 30,
+            ),
+          ),
+        OutlinedButton(
+            onPressed: flash,
+            child: const Text(
+               "Flash",
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
