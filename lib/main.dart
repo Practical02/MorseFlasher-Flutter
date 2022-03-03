@@ -56,7 +56,7 @@ Map mapper = {
   '=': '-...-',
 };
 
-Map timing = {'-': 300, '.': 100, ' ': 0};
+Map timing = {'-': 300, '.': 75, ' ': 0};
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -65,7 +65,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'App Title',
-
       home: MyHomePage(),
       debugShowCheckedModeBanner: false,
     );
@@ -82,27 +81,35 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController text1 = TextEditingController();
 
-  String morsecode = '';
-
+  var morse = '';
+  var isButtonClickable = true;
   void text2morse() {
     setState(() {
       String temp = text1.text.toLowerCase();
-      morsecode = '';
+      morse = '';
+
       for (int i = 0; i < temp.length; i++) {
-        morsecode += mapper[temp[i]] + ' ';
+        morse += mapper[temp[i]] + ' ';
         }
       }
     );
   }
 
   void flash() {
-    for (int i = 0; i < morsecode.length - 1; i++) {
-      int time = timing[morsecode[i]];
+    setState(() {
+      isButtonClickable = false;
+    });
+    for (int i = 0; i < morse.length - 1; i++)
+    {
+      int time = timing[morse[i]];
       time > 0 ? TorchLight.enableTorch() : 1;
       sleep(Duration(milliseconds: time));
       TorchLight.disableTorch();
       sleep(const Duration(milliseconds: 100));
     }
+    setState(() {
+      isButtonClickable = true;
+    });
   }
 
   @override
@@ -117,29 +124,43 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: Column(children: <Widget>[
-        TextField(
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        child: TextField(
           controller: text1,
           decoration: const InputDecoration(
-            border: OutlineInputBorder(
-            )
+            border: OutlineInputBorder(),
+            hintText: 'Enter Text here',
+            ),
           ),
         ),
-        OutlinedButton(
+        ElevatedButton(
             onPressed: text2morse,
             child: const Text(
               "Convert",
             )
         ),
         Text(
-          morsecode,
+          morse,
           style: const TextStyle(
             fontSize: 30,
             ),
           ),
-        OutlinedButton(
-            onPressed: flash,
+        Visibility(
+            visible: isButtonClickable,
+            child: ElevatedButton(
+              onPressed: ()
+              {
+                if (isButtonClickable)
+                  {
+                    flash();
+                  }
+              },
             child: const Text(
-               "Flash",
+              "Flash",
+              style: TextStyle(
+              color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],
